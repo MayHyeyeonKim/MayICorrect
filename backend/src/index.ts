@@ -2,6 +2,7 @@ import express from 'express';
 import cors from 'cors';
 import dotenv from 'dotenv';
 import correctionRouter from './routes/correction';
+import ttsRouter from './routes/tts';
 
 dotenv.config();
 
@@ -21,6 +22,7 @@ app.use(express.json());
 
 // Routes
 app.use('/api', correctionRouter);
+app.use('/api', ttsRouter);
 
 // Health check
 app.get('/health', (req, res) => {

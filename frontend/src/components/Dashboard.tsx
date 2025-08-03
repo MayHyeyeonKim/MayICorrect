@@ -17,8 +17,11 @@ import {
   Button,
   Alert,
   LinearProgress,
+  IconButton,
+  Tooltip,
+  CircularProgress,
 } from '@mui/material';
-import { History, TrendingUp, School, Star } from '@mui/icons-material';
+import { History, TrendingUp, School, Star, VolumeUp } from '@mui/icons-material';
 
 interface CorrectionHistory {
   id: string;
@@ -42,6 +45,8 @@ const Dashboard = ({ userName }: DashboardProps) => {
     mostUsedCategory: '',
     improvementRate: 0,
   });
+  const [currentAudio, setCurrentAudio] = useState<HTMLAudioElement | null>(null);
+  const [loadingAudio, setLoadingAudio] = useState<string | null>(null);
 
   useEffect(() => {
     const savedHistory = localStorage.getItem('correctionHistory');
@@ -108,6 +113,67 @@ const Dashboard = ({ userName }: DashboardProps) => {
       hour: '2-digit',
       minute: '2-digit',
     }).format(date);
+  };
+
+  const speakText = async (text: string) => {
+    try {
+      // 현재 재생 중인 오디오가 있으면 중지
+      if (currentAudio) {
+        currentAudio.pause();
+        currentAudio.currentTime = 0;
+        setCurrentAudio(null);
+      }
+
+      // 로딩 시작
+      setLoadingAudio(text);
+
+      const response = await fetch('http://localhost:3001/api/speak', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ 
+          text: text,
+          voice: 'nova' // 여성적이고 부드러운 음성 사용
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error(`TTS API 오류: ${response.status}`);
+      }
+
+      // 오디오 blob 생성
+      const audioBlob = await response.blob();
+      const audioUrl = URL.createObjectURL(audioBlob);
+      
+      // 새로운 오디오 객체 생성
+      const audio = new Audio(audioUrl);
+      setCurrentAudio(audio);
+      
+      // 로딩 완료
+      setLoadingAudio(null);
+      
+      // 오디오 재생
+      await audio.play();
+      
+      // 재생 완료 후 정리
+      audio.addEventListener('ended', () => {
+        URL.revokeObjectURL(audioUrl);
+        setCurrentAudio(null);
+      });
+
+      // 오디오 에러 처리
+      audio.addEventListener('error', () => {
+        URL.revokeObjectURL(audioUrl);
+        setCurrentAudio(null);
+      });
+
+    } catch (error) {
+      console.error('TTS 오류:', error);
+      alert('음성 재생 중 오류가 발생했습니다.');
+      setCurrentAudio(null);
+      setLoadingAudio(null);
+    }
   };
 
   return (
@@ -259,9 +325,31 @@ const Dashboard = ({ userName }: DashboardProps) => {
                         </Typography>
                       </TableCell>
                       <TableCell>
-                        <Typography variant="body2" sx={{ maxWidth: 200, wordBreak: 'break-word', color: 'success.main', fontWeight: 'medium' }}>
-                          {item.correctedSentence}
-                        </Typography>
+                        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                          <Typography variant="body2" sx={{ maxWidth: 200, wordBreak: 'break-word', color: 'success.main', fontWeight: 'medium' }}>
+                            {item.correctedSentence}
+                          </Typography>
+                          <Tooltip title="교정된 문장 듣기">
+                            <IconButton
+                              size="small"
+                              onClick={() => speakText(item.correctedSentence)}
+                              disabled={loadingAudio === item.correctedSentence}
+                              sx={{ 
+                                color: 'primary.main',
+                                '&:hover': {
+                                  backgroundColor: 'primary.light',
+                                  color: 'white'
+                                }
+                              }}
+                            >
+                              {loadingAudio === item.correctedSentence ? (
+                                <CircularProgress size={16} />
+                              ) : (
+                                <VolumeUp fontSize="small" />
+                              )}
+                            </IconButton>
+                          </Tooltip>
+                        </Box>
                       </TableCell>
                       <TableCell>
                         <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5 }}>
