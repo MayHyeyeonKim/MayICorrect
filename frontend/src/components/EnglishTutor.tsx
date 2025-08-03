@@ -17,6 +17,8 @@ import {
   TableHead,
   TableRow,
   Stack,
+  IconButton,
+  Tooltip,
 } from '@mui/material';
 import {
   Send as SendIcon,
@@ -26,6 +28,7 @@ import {
   MenuBook as MenuBookIcon,
   Label as LabelIcon,
   AutoAwesome as AutoAwesomeIcon,
+  VolumeUp as VolumeUpIcon,
 } from '@mui/icons-material';
 
 interface CorrectionResult {
@@ -45,6 +48,8 @@ const EnglishTutor: React.FC = () => {
   const [result, setResult] = useState<CorrectionResult | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [currentAudio, setCurrentAudio] = useState<HTMLAudioElement | null>(null);
+  const [loadingAudio, setLoadingAudio] = useState<string | null>(null);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -109,6 +114,67 @@ const EnglishTutor: React.FC = () => {
     setUserEnglish('');
     setResult(null);
     setError(null);
+  };
+
+  const speakText = async (text: string) => {
+    try {
+      // 현재 재생 중인 오디오가 있으면 중지
+      if (currentAudio) {
+        currentAudio.pause();
+        currentAudio.currentTime = 0;
+        setCurrentAudio(null);
+      }
+
+      // 로딩 시작
+      setLoadingAudio(text);
+
+      const response = await fetch('http://localhost:3001/api/speak', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ 
+          text: text,
+          voice: 'nova' // 여성적이고 부드러운 음성 사용
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error(`TTS API 오류: ${response.status}`);
+      }
+
+      // 오디오 blob 생성
+      const audioBlob = await response.blob();
+      const audioUrl = URL.createObjectURL(audioBlob);
+      
+      // 새로운 오디오 객체 생성
+      const audio = new Audio(audioUrl);
+      setCurrentAudio(audio);
+      
+      // 로딩 완료
+      setLoadingAudio(null);
+      
+      // 오디오 재생
+      await audio.play();
+      
+      // 재생 완료 후 정리
+      audio.addEventListener('ended', () => {
+        URL.revokeObjectURL(audioUrl);
+        setCurrentAudio(null);
+      });
+
+      // 오디오 에러 처리
+      audio.addEventListener('error', () => {
+        URL.revokeObjectURL(audioUrl);
+        setCurrentAudio(null);
+      });
+
+    } catch (error) {
+      console.error('TTS 오류:', error);
+      alert('음성 재생 중 오류가 발생했습니다.');
+      setCurrentAudio(null);
+      setLoadingAudio(null);
+    }
   };
 
   return (
@@ -200,9 +266,32 @@ const EnglishTutor: React.FC = () => {
                   borderLeft: '4px solid #4caf50',
                 }}
               >
-                <Typography variant="h6" sx={{ fontWeight: 500, lineHeight: 1.6 }}>
-                  {result.correctedSentence}
-                </Typography>
+                <Box display="flex" alignItems="center" justifyContent="space-between">
+                  <Typography variant="h6" sx={{ fontWeight: 500, lineHeight: 1.6, flex: 1 }}>
+                    {result.correctedSentence}
+                  </Typography>
+                  <Tooltip title="교정된 문장 듣기">
+                    <IconButton
+                      onClick={() => speakText(result.correctedSentence)}
+                      disabled={loadingAudio === result.correctedSentence}
+                      sx={{ 
+                        ml: 2,
+                        color: 'success.main',
+                        backgroundColor: 'rgba(76, 175, 80, 0.1)',
+                        '&:hover': {
+                          backgroundColor: 'success.main',
+                          color: 'white'
+                        }
+                      }}
+                    >
+                      {loadingAudio === result.correctedSentence ? (
+                        <CircularProgress size={24} />
+                      ) : (
+                        <VolumeUpIcon />
+                      )}
+                    </IconButton>
+                  </Tooltip>
+                </Box>
               </Paper>
             </CardContent>
           </Card>
@@ -281,8 +370,36 @@ const EnglishTutor: React.FC = () => {
                           <TableCell sx={{ color: '#2e7d32', fontWeight: 500 }}>
                             {vocab.meaning}
                           </TableCell>
-                          <TableCell sx={{ fontStyle: 'italic', color: '#666' }}>
-                            {vocab.example}
+                          <TableCell>
+                            <Box display="flex" alignItems="center" justifyContent="space-between">
+                              <Typography 
+                                variant="body2" 
+                                sx={{ fontStyle: 'italic', color: '#666', flex: 1 }}
+                              >
+                                {vocab.example}
+                              </Typography>
+                              <Tooltip title="예시 문장 듣기">
+                                <IconButton
+                                  size="small"
+                                  onClick={() => speakText(vocab.example)}
+                                  disabled={loadingAudio === vocab.example}
+                                  sx={{ 
+                                    ml: 1,
+                                    color: 'primary.main',
+                                    '&:hover': {
+                                      backgroundColor: 'primary.light',
+                                      color: 'white'
+                                    }
+                                  }}
+                                >
+                                  {loadingAudio === vocab.example ? (
+                                    <CircularProgress size={16} />
+                                  ) : (
+                                    <VolumeUpIcon fontSize="small" />
+                                  )}
+                                </IconButton>
+                              </Tooltip>
+                            </Box>
                           </TableCell>
                         </TableRow>
                       ))}
