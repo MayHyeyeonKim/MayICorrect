@@ -1,1 +1,1 @@
-export { correctEnglish, correctEnglishWithOpenAI } from './geminiService';
+export { correctEnglish, correctEnglishWithOpenAI } from './aiService';

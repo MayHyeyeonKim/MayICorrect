@@ -1,5 +1,5 @@
 import express from 'express';
-import { correctEnglish } from '../services/geminiService';
+import { correctEnglish } from '../services/aiService';
 
 const router = express.Router();
 

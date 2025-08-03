@@ -86,7 +86,7 @@ MayICorrect/
 │   │   ├── 📁 routes/          # API routes
 │   │   │   └── correction.ts   # Correction API endpoints
 │   │   ├── 📁 services/        # Business logic
-│   │   │   └── geminiService.ts # AI correction service
+│   │   │   └── aiService.ts    # AI correction service
 │   │   └── index.ts            # Server entry point
 │   ├── .env.example            # Environment variables template
 │   ├── package.json            # Backend dependencies
