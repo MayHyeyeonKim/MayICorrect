@@ -13,7 +13,9 @@
   [![OpenAI](https://img.shields.io/badge/OpenAI-GPT--3.5-orange.svg)](https://openai.com/)
 </div>
 
-![May I Correct Demo](frontend/public/mayIcorrect1.gif)
+<div align="center">
+  <img src="frontend/public/mayIcorrect1.gif" alt="May I Correct Demo" width="800"/>
+</div>
 
 ## 📖 Project Overview
 
@@ -22,10 +24,12 @@
 ### ✨ Key Features
 
 - **OpenAI GPT-based AI Correction**: Powered by cutting-edge AI technology for natural and accurate English corrections
+- **High-Quality Text-to-Speech**: OpenAI TTS-1 model with Nova voice for natural English pronunciation
 - **Real-time Grammar Analysis**: Grammar error detection and improvement suggestions
+- **Voice Learning Support**: Listen to corrected sentences and vocabulary examples
 - **Vocabulary Learning**: New words and expressions with usage examples
 - **Smart Category Classification**: Automatic categorization (IT/Tech, Business, Daily Conversation, etc.)
-- **Learning Dashboard**: Correction history and learning statistics
+- **Learning Dashboard**: Correction history and learning statistics with voice playback
 - **History Management**: Save correction results and export data
 - **User Authentication**: Login/logout and personal data management
 - **Responsive Design**: Mobile and desktop optimized
@@ -40,6 +44,7 @@
 ## 🛠️ Tech Stack
 
 ### Frontend
+
 - **React 19** - Latest React features
 - **TypeScript** - Type safety guaranteed
 - **Vite 7.0.6** - Fast development server and build
@@ -48,14 +53,17 @@
 - **Emotion** - CSS-in-JS styling
 
 ### Backend
+
 - **Node.js** - JavaScript runtime
 - **Express 5.1.0** - Web framework
 - **TypeScript** - Backend type safety
 - **OpenAI API** - GPT-3.5-turbo based AI correction engine
+- **OpenAI TTS-1** - High-quality text-to-speech API with Nova voice
 - **CORS** - Cross-origin resource sharing
 - **dotenv** - Environment variable management
 
 ### Development Tools
+
 - **Concurrently** - Run multiple development servers
 - **Nodemon** - Auto server restart
 - **ESLint & Prettier** - Code quality management
@@ -84,7 +92,8 @@ MayICorrect/
 ├── 📁 backend/                  # Node.js Backend
 │   ├── 📁 src/
 │   │   ├── 📁 routes/          # API routes
-│   │   │   └── correction.ts   # Correction API endpoints
+│   │   │   ├── correction.ts   # Correction API endpoints
+│   │   │   └── tts.ts          # Text-to-Speech API endpoints
 │   │   ├── 📁 services/        # Business logic
 │   │   │   └── aiService.ts    # AI correction service
 │   │   └── index.ts            # Server entry point
@@ -132,6 +141,7 @@ cp .env.example .env
 ```
 
 **Edit `.env` file:**
+
 ```env
 # Server configuration
 PORT=3001
@@ -145,6 +155,7 @@ GEMINI_API_KEY=your_gemini_api_key_here
 ```
 
 > 🔑 **How to get API Key:**
+>
 > 1. Create an account at [OpenAI Platform](https://platform.openai.com/api-keys)
 > 2. Go to API Keys page and create a new key
 > 3. Enter the generated key in the `.env` file
@@ -157,6 +168,7 @@ npm run dev
 ```
 
 **Run individually:**
+
 ```bash
 # Frontend only
 npm run dev:frontend  # http://localhost:5173
@@ -178,11 +190,13 @@ npm run dev:backend   # http://localhost:3001
 </div>
 
 1. **Enter Korean sentence**
+
    ```
    Example: "나는 어제 친구와 영화를 봤다"
    ```
 
 2. **Enter English translation**
+
    ```
    Example: "I watch movie with friend yesterday"
    ```
@@ -198,33 +212,62 @@ npm run dev:backend   # http://localhost:3001
 ### 2. Login and Personalization
 
 **Demo Account Login:**
+
 - 📧 **Username**: `demo`
 - 🔑 **Password**: `demo123`
 
 **Features available after login:**
+
 - 📊 Personal learning dashboard
 - 📋 Correction history management
 - 📈 Learning statistics and progress tracking
 
-### 3. Learning Dashboard
+### 3. Text-to-Speech (TTS) Features
+
+<div align="center">
+  <img src="frontend/public/TTS1.png" alt="TTS Feature - Voice Playback" width="600"/>
+</div>
+
+**🔊 Real-time Voice Pronunciation**
+
+- **Multiple Voice Options**: Experience corrected sentences with high-quality AI-generated voices
+- **Instant Playback**: Click the speaker button to hear immediate pronunciation of corrected text
+- **Natural Pronunciation**: OpenAI TTS-1 model with Nova voice for authentic English pronunciation
+- **Interactive Learning**: Listen to corrections as many times as needed for better understanding
+
+<div align="center">
+  <img src="frontend/public/TTS2.png" alt="TTS Feature - History Playback" width="600"/>
+</div>
+
+**📚 History Voice Playback**
+
+- **Revisit Past Corrections**: Access voice playback for all previously corrected sentences in your learning dashboard
+- **Continuous Learning**: Review and listen to past corrections anytime to reinforce learning
+- **Learning Reinforcement**: Repeat listening to difficult sentences for better retention
+- **Audio Learning Support**: Perfect for auditory learners who benefit from hearing corrections multiple times
+
+### 4. Learning Dashboard
 
 <div align="center">
   <img src="frontend/public/DashboardFeatures.png" alt="Dashboard Features" width="600"/>
 </div>
 
 **📊 Statistics:**
+
 - Total correction count
 - Category-wise learning analysis
 - Recent learning activities
 - Learning progress summary
 
 **📋 History Management:**
+
 - View all correction records
 - Filter by date/category
 - Bookmark feature
 - Add notes
 
 **💾 Data Management:**
+
 - Export data in JSON format
 - Backup learning records
 - Reset history
@@ -232,18 +275,21 @@ npm run dev:backend   # http://localhost:3001
 ## 🌟 AI Correction System Features
 
 ### 🤖 High-Quality AI Engine
+
 - **OpenAI GPT-3.5-turbo** model integration
 - Context-aware natural corrections
 - Korean-specific customized feedback
 - Real-time correction with instant feedback
 
 ### 🔍 Detailed Analysis
+
 - **Grammar error** detection and correction
 - **Vocabulary selection** improvement suggestions
 - **Natural expression** transformation
 - **Style and tone** adjustment
 
 ### 📂 Smart Category Classification
+
 - **IT/Tech**: Programming, computers, software
 - **Business**: Meetings, presentations, emails
 - **Daily Conversation**: Hobbies, family, friends
@@ -254,16 +300,20 @@ npm run dev:backend   # http://localhost:3001
 - **Entertainment**: Movies, music, games
 
 ### 💡 Learning Support Features
+
 - **Practical examples** provided
 - **Usage explanations** included
 - **Similar expressions** recommended
-- **Pronunciation guide** (coming soon)
+- **High-quality voice playback** with OpenAI TTS-1 Nova voice
+- **Multi-listening support** for better pronunciation learning
+- **History voice playback** for review and reinforcement
 
 ## 🔧 Developer Guide
 
 ### API Documentation
 
 #### Correction Request
+
 ```http
 POST /api/correct
 Content-Type: application/json
@@ -274,15 +324,32 @@ Content-Type: application/json
 }
 ```
 
+#### Text-to-Speech Request
+
+```http
+POST /api/speak
+Content-Type: application/json
+
+{
+  "text": "Text to convert to speech",
+  "voice": "nova"
+}
+```
+
+#### TTS Response
+
+```
+Content-Type: audio/mpeg
+Binary audio data (MP3 format)
+```
+
 #### Response Format
+
 ```json
 {
   "success": true,
   "correctedSentence": "Corrected English sentence",
-  "explanation": [
-    "Corrected tense to past form",
-    "Added article 'a' for natural expression"
-  ],
+  "explanation": ["Corrected tense to past form", "Added article 'a' for natural expression"],
   "vocabulary": [
     {
       "expression": "watched",
@@ -295,6 +362,7 @@ Content-Type: application/json
 ```
 
 #### Error Response
+
 ```json
 {
   "success": false,
@@ -305,6 +373,7 @@ Content-Type: application/json
 ### Build and Deployment
 
 #### Frontend Build
+
 ```bash
 cd frontend
 npm run build
@@ -312,6 +381,7 @@ npm run build
 ```
 
 #### Backend Build
+
 ```bash
 cd backend
 npm run build
@@ -319,6 +389,7 @@ npm start
 ```
 
 #### Docker Deployment (Coming Soon)
+
 ```bash
 # After creating Dockerfile
 docker build -t mayicorrect .
@@ -328,6 +399,7 @@ docker run -p 3000:3000 mayicorrect
 ## 🧪 Testing
 
 ### Run Unit Tests
+
 ```bash
 # Frontend tests
 cd frontend && npm test
@@ -337,6 +409,7 @@ cd backend && npm test
 ```
 
 ### API Testing
+
 ```bash
 # Test correction API
 curl -X POST http://localhost:3001/api/correct \
@@ -371,18 +444,21 @@ We welcome all forms of contributions!
 ## 📋 Roadmap
 
 ### v1.1.0 (Planned)
+
 - [ ] Voice recognition feature
 - [ ] Pronunciation evaluation system
 - [ ] Multi-language support (Japanese, Chinese)
 - [ ] Mobile app release
 
 ### v1.2.0 (Planned)
+
 - [ ] Grammar learning mode
 - [ ] Quiz and game features
 - [ ] Social learning features
 - [ ] Learning achievement badge system
 
 ### v2.0.0 (Long-term Plan)
+
 - [ ] AI tutor chat feature
 - [ ] Real-time conversation practice
 - [ ] VR/AR learning environment
@@ -393,6 +469,7 @@ We welcome all forms of contributions!
 ### Frequently Asked Questions
 
 **Q: OpenAI API key error occurs**
+
 ```
 A: 1. Check if API key is correctly configured
    2. Verify API key has sufficient credits
@@ -400,6 +477,7 @@ A: 1. Check if API key is correctly configured
 ```
 
 **Q: Server won't start**
+
 ```
 A: 1. Check Node.js version (18.0.0 or higher)
    2. Verify port 3001 is not in use
@@ -407,6 +485,7 @@ A: 1. Check Node.js version (18.0.0 or higher)
 ```
 
 **Q: No correction results**
+
 ```
 A: 1. Check if backend server is running
    2. Verify network connection
@@ -424,6 +503,7 @@ A: 1. Check if backend server is running
 This project is distributed under the **Creative Commons Attribution-NonCommercial 4.0 International License**.
 
 **Permitted:**
+
 - ✅ **Personal Use** - Individual learning and research purposes
 - ✅ **Educational Use** - Schools, universities, and educational institutions
 - ✅ **Non-profit Use** - Non-profit organizations and institutions
@@ -431,6 +511,7 @@ This project is distributed under the **Creative Commons Attribution-NonCommerci
 - ✅ **Academic Research** - Papers, research projects, etc.
 
 **Restrictions:**
+
 - ❌ **Commercial Use Prohibited** - No revenue-generating use
 - ❌ **Sales Prohibited** - Cannot sell the software itself
 - ❌ **Commercial Services Prohibited** - Cannot provide as paid service
@@ -443,9 +524,9 @@ Creative Commons Attribution-NonCommercial 4.0 International License
 
 Copyright (c) 2025 MayHyeyeonKim
 
-This work is licensed under a Creative Commons Attribution-NonCommercial 4.0 
-International License. You may share and adapt this material for any purpose, 
-except commercially. You must give appropriate credit, provide a link to the 
+This work is licensed under a Creative Commons Attribution-NonCommercial 4.0
+International License. You may share and adapt this material for any purpose,
+except commercially. You must give appropriate credit, provide a link to the
 license, and indicate if changes were made.
 ```
 
