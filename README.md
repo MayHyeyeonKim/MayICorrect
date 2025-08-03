@@ -174,7 +174,7 @@ npm run dev:backend   # http://localhost:3001
 ### 1. Basic Correction Feature
 
 <div align="center">
-  <img src="https://via.placeholder.com/600x300/f0f0f0/333?text=Basic+Correction+Demo" alt="Basic Correction Demo" width="600"/>
+  <img src="frontend/public/BasicCorrectionDemo.png" alt="Basic Correction Demo" width="600"/>
 </div>
 
 1. **Enter Korean sentence**
@@ -209,7 +209,7 @@ npm run dev:backend   # http://localhost:3001
 ### 3. Learning Dashboard
 
 <div align="center">
-  <img src="https://via.placeholder.com/600x400/e3f2fd/1976d2?text=Dashboard+Features" alt="Dashboard Features" width="600"/>
+  <img src="frontend/public/DashboardFeatures.png" alt="Dashboard Features" width="600"/>
 </div>
 
 **📊 Statistics:**
