@@ -36,7 +36,8 @@ logs
 *.mp4
 *.mov
 *.avi
-frontend/public/mayIcorrect1.gif
+# But allow the demo GIF
+!frontend/public/mayIcorrect1.gif
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
