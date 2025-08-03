@@ -1,7 +1,7 @@
 # May I Correct? 🚀
 
 <div align="center">
-  <img src="public/MayICorrectLogo.png" alt="May I Correct Logo" width="120" height="120" style="border-radius: 50%"/>
+  <img src="frontend/public/MayICorrectLogo.png" alt="May I Correct Logo" width="120" height="120" style="border-radius: 50%"/>
   
   **AI-Powered English Correction System**  
   *Korean to English Conversation Helper*
