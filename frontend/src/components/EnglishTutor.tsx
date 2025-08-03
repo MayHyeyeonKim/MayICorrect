@@ -42,6 +42,142 @@ interface CorrectionResult {
   tags: string[];
 }
 
+interface DiffResult {
+  type: 'same' | 'changed' | 'added' | 'removed';
+  text: string;
+}
+
+// 두 문장의 차이점을 비교하는 함수
+const createDiff = (userText: string, correctedText: string): { userDiff: DiffResult[], correctedDiff: DiffResult[] } => {
+  const userWords = userText.toLowerCase().split(/\s+/);
+  const correctedWords = correctedText.toLowerCase().split(/\s+/);
+  const originalUserWords = userText.split(/\s+/);
+  const originalCorrectedWords = correctedText.split(/\s+/);
+  
+  const userDiff: DiffResult[] = [];
+  const correctedDiff: DiffResult[] = [];
+  
+  let userIndex = 0;
+  let correctedIndex = 0;
+  
+  while (userIndex < userWords.length || correctedIndex < correctedWords.length) {
+    if (userIndex >= userWords.length) {
+      // 교정된 문장에만 남은 단어들 (추가된 단어)
+      correctedDiff.push({ type: 'added', text: originalCorrectedWords[correctedIndex] });
+      correctedIndex++;
+    } else if (correctedIndex >= correctedWords.length) {
+      // 사용자 문장에만 남은 단어들 (삭제된 단어)
+      userDiff.push({ type: 'removed', text: originalUserWords[userIndex] });
+      userIndex++;
+    } else if (userWords[userIndex] === correctedWords[correctedIndex]) {
+      // 같은 단어
+      userDiff.push({ type: 'same', text: originalUserWords[userIndex] });
+      correctedDiff.push({ type: 'same', text: originalCorrectedWords[correctedIndex] });
+      userIndex++;
+      correctedIndex++;
+    } else {
+      // 다른 단어 - 간단한 휴리스틱으로 처리
+      let found = false;
+      
+      // 교정된 문장에서 현재 사용자 단어를 찾아보기
+      for (let i = correctedIndex; i < Math.min(correctedIndex + 3, correctedWords.length); i++) {
+        if (userWords[userIndex] === correctedWords[i]) {
+          // 중간에 추가된 단어들
+          for (let j = correctedIndex; j < i; j++) {
+            correctedDiff.push({ type: 'added', text: originalCorrectedWords[j] });
+          }
+          userDiff.push({ type: 'same', text: originalUserWords[userIndex] });
+          correctedDiff.push({ type: 'same', text: originalCorrectedWords[i] });
+          correctedIndex = i + 1;
+          userIndex++;
+          found = true;
+          break;
+        }
+      }
+      
+      if (!found) {
+        // 사용자 문장에서 현재 교정 단어를 찾아보기
+        let userFound = false;
+        for (let i = userIndex; i < Math.min(userIndex + 3, userWords.length); i++) {
+          if (correctedWords[correctedIndex] === userWords[i]) {
+            // 중간에 삭제된 단어들
+            for (let j = userIndex; j < i; j++) {
+              userDiff.push({ type: 'removed', text: originalUserWords[j] });
+            }
+            userDiff.push({ type: 'same', text: originalUserWords[i] });
+            correctedDiff.push({ type: 'same', text: originalCorrectedWords[correctedIndex] });
+            userIndex = i + 1;
+            correctedIndex++;
+            userFound = true;
+            break;
+          }
+        }
+        
+        if (!userFound) {
+          // 변경된 단어로 처리
+          userDiff.push({ type: 'changed', text: originalUserWords[userIndex] });
+          correctedDiff.push({ type: 'changed', text: originalCorrectedWords[correctedIndex] });
+          userIndex++;
+          correctedIndex++;
+        }
+      }
+    }
+  }
+  
+  return { userDiff, correctedDiff };
+};
+
+// Diff 결과를 렌더링하는 컴포넌트
+const DiffText: React.FC<{ diff: DiffResult[] }> = ({ diff }) => {
+  return (
+    <span>
+      {diff.map((item, index) => {
+        let style: React.CSSProperties = {};
+        
+        switch (item.type) {
+          case 'same':
+            style = {};
+            break;
+          case 'changed':
+            style = { 
+              backgroundColor: '#ffebee', 
+              color: '#c62828', 
+              padding: '2px 4px', 
+              borderRadius: '3px',
+              fontWeight: 'bold'
+            };
+            break;
+          case 'added':
+            style = { 
+              backgroundColor: '#e8f5e8', 
+              color: '#2e7d32', 
+              padding: '2px 4px', 
+              borderRadius: '3px',
+              fontWeight: 'bold'
+            };
+            break;
+          case 'removed':
+            style = { 
+              backgroundColor: '#ffebee', 
+              color: '#c62828', 
+              textDecoration: 'line-through',
+              padding: '2px 4px', 
+              borderRadius: '3px'
+            };
+            break;
+        }
+        
+        return (
+          <span key={index} style={style}>
+            {item.text}
+            {index < diff.length - 1 ? ' ' : ''}
+          </span>
+        );
+      })}
+    </span>
+  );
+};
+
 const EnglishTutor: React.FC = () => {
   const [korean, setKorean] = useState('');
   const [userEnglish, setUserEnglish] = useState('');
@@ -256,43 +392,99 @@ const EnglishTutor: React.FC = () => {
               <Box display="flex" alignItems="center" mb={2}>
                 <CheckCircleIcon color="success" sx={{ mr: 1 }} />
                 <Typography variant="h6" component="h3">
-                  📝 Corrected Sentence
+                  📝 Sentence Comparison
                 </Typography>
               </Box>
-              <Paper
-                sx={{
-                  p: 3,
-                  backgroundColor: '#e8f5e8',
-                  borderLeft: '4px solid #4caf50',
-                }}
-              >
-                <Box display="flex" alignItems="center" justifyContent="space-between">
-                  <Typography variant="h6" sx={{ fontWeight: 500, lineHeight: 1.6, flex: 1 }}>
-                    {result.correctedSentence}
+              
+              {/* Original User Input */}
+              <Box mb={2}>
+                <Typography variant="subtitle2" sx={{ mb: 1, color: 'text.secondary' }}>
+                  Your Translation:
+                </Typography>
+                <Paper
+                  sx={{
+                    p: 2,
+                    backgroundColor: '#fff3e0',
+                    borderLeft: '4px solid #ff9800',
+                  }}
+                >
+                  <Typography variant="body1" sx={{ lineHeight: 1.6 }}>
+                    <DiffText diff={createDiff(userEnglish, result.correctedSentence).userDiff} />
                   </Typography>
-                  <Tooltip title="교정된 문장 듣기">
-                    <IconButton
-                      onClick={() => speakText(result.correctedSentence)}
-                      disabled={loadingAudio === result.correctedSentence}
-                      sx={{ 
-                        ml: 2,
-                        color: 'success.main',
-                        backgroundColor: 'rgba(76, 175, 80, 0.1)',
-                        '&:hover': {
-                          backgroundColor: 'success.main',
-                          color: 'white'
-                        }
-                      }}
-                    >
-                      {loadingAudio === result.correctedSentence ? (
-                        <CircularProgress size={24} />
-                      ) : (
-                        <VolumeUpIcon />
-                      )}
-                    </IconButton>
-                  </Tooltip>
-                </Box>
-              </Paper>
+                </Paper>
+              </Box>
+
+              {/* Corrected Sentence */}
+              <Box>
+                <Typography variant="subtitle2" sx={{ mb: 1, color: 'text.secondary' }}>
+                  Corrected Sentence:
+                </Typography>
+                <Paper
+                  sx={{
+                    p: 2,
+                    backgroundColor: '#e8f5e8',
+                    borderLeft: '4px solid #4caf50',
+                  }}
+                >
+                  <Box display="flex" alignItems="center" justifyContent="space-between">
+                    <Typography variant="body1" sx={{ lineHeight: 1.6, flex: 1 }}>
+                      <DiffText diff={createDiff(userEnglish, result.correctedSentence).correctedDiff} />
+                    </Typography>
+                    <Tooltip title="교정된 문장 듣기">
+                      <IconButton
+                        onClick={() => speakText(result.correctedSentence)}
+                        disabled={loadingAudio === result.correctedSentence}
+                        sx={{ 
+                          ml: 2,
+                          color: 'success.main',
+                          backgroundColor: 'rgba(76, 175, 80, 0.1)',
+                          '&:hover': {
+                            backgroundColor: 'success.main',
+                            color: 'white'
+                          }
+                        }}
+                      >
+                        {loadingAudio === result.correctedSentence ? (
+                          <CircularProgress size={24} />
+                        ) : (
+                          <VolumeUpIcon />
+                        )}
+                      </IconButton>
+                    </Tooltip>
+                  </Box>
+                </Paper>
+              </Box>
+              
+              {/* Legend */}
+              <Box mt={2} display="flex" flexWrap="wrap" gap={1}>
+                <Chip
+                  size="small"
+                  label="Changed"
+                  sx={{ 
+                    backgroundColor: '#ffebee', 
+                    color: '#c62828',
+                    fontWeight: 'bold'
+                  }}
+                />
+                <Chip
+                  size="small"
+                  label="Added"
+                  sx={{ 
+                    backgroundColor: '#e8f5e8', 
+                    color: '#2e7d32',
+                    fontWeight: 'bold'
+                  }}
+                />
+                <Chip
+                  size="small"
+                  label="Removed"
+                  sx={{ 
+                    backgroundColor: '#ffebee', 
+                    color: '#c62828',
+                    textDecoration: 'line-through'
+                  }}
+                />
+              </Box>
             </CardContent>
           </Card>
 

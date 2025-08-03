@@ -25,6 +25,7 @@
 
 - **OpenAI GPT-based AI Correction**: Powered by cutting-edge AI technology for natural and accurate English corrections
 - **High-Quality Text-to-Speech**: OpenAI TTS-1 model with Nova voice for natural English pronunciation
+- **Advanced Sentence Comparison**: Visual diff highlighting to show differences between your translation and corrections
 - **Real-time Grammar Analysis**: Grammar error detection and improvement suggestions
 - **Voice Learning Support**: Listen to corrected sentences and vocabulary examples
 - **Vocabulary Learning**: New words and expressions with usage examples
@@ -246,7 +247,45 @@ npm run dev:backend   # http://localhost:3001
 - **Learning Reinforcement**: Repeat listening to difficult sentences for better retention
 - **Audio Learning Support**: Perfect for auditory learners who benefit from hearing corrections multiple times
 
-### 4. Learning Dashboard
+### 4. Advanced Sentence Comparison
+
+<div align="center">
+  <img src="frontend/public/SentenceComparison1.png" alt="Sentence Comparison - Visual Diff" width="600"/>
+</div>
+
+**🔍 Visual Difference Highlighting**
+- **Smart Comparison Algorithm**: Advanced word-by-word comparison between your translation and the corrected sentence
+- **Color-coded Differences**: Instantly identify what needs improvement with intuitive visual cues
+- **Side-by-side Display**: Your translation and corrected version displayed for easy comparison
+- **Learning Enhancement**: Understand exactly where mistakes occurred for faster improvement
+
+<div align="center">
+  <img src="frontend/public/SentenceComparison2.png" alt="Sentence Comparison - History View" width="600"/>
+</div>
+
+**📊 History Comparison View**
+- **Comprehensive Learning History**: Review all your past corrections with visual diff highlighting
+- **Progress Tracking**: See patterns in your common mistakes and improvements over time
+- **Interactive Elements**: Click to hear pronunciation while viewing visual differences
+- **Mistake Pattern Analysis**: Understand recurring errors to focus your learning efforts
+
+**🎨 Visual Legend:**
+- 🔴 **Red Background**: Changed/incorrect words that were modified
+- 🟢 **Green Background**: Words that were added for natural expression
+- ~~**Strikethrough**~~: Words that were removed or unnecessary
+- **Normal Text**: Correctly used words
+
+<div align="center">
+  <img src="frontend/public/SentenceComparison3.png" alt="Sentence Comparison - Advanced Features" width="600"/>
+</div>
+
+**⚡ Advanced Comparison Features**
+- **Real-time Analysis**: Instant visual feedback as you type and submit corrections
+- **Multi-level Comparison**: Detailed analysis of grammar, vocabulary, and style differences
+- **Learning Insights**: AI-powered suggestions based on your comparison patterns
+- **Interactive Tooltips**: Hover over highlighted differences for detailed explanations
+
+### 5. Learning Dashboard
 
 <div align="center">
   <img src="frontend/public/DashboardFeatures.png" alt="Dashboard Features" width="600"/>

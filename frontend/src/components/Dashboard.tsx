@@ -37,6 +37,136 @@ interface DashboardProps {
   userName: string;
 }
 
+interface DiffResult {
+  type: 'same' | 'changed' | 'added' | 'removed';
+  text: string;
+}
+
+// 두 문장의 차이점을 비교하는 함수
+const createDiff = (userText: string, correctedText: string): { userDiff: DiffResult[], correctedDiff: DiffResult[] } => {
+  const userWords = userText.toLowerCase().split(/\s+/);
+  const correctedWords = correctedText.toLowerCase().split(/\s+/);
+  const originalUserWords = userText.split(/\s+/);
+  const originalCorrectedWords = correctedText.split(/\s+/);
+  
+  const userDiff: DiffResult[] = [];
+  const correctedDiff: DiffResult[] = [];
+  
+  let userIndex = 0;
+  let correctedIndex = 0;
+  
+  while (userIndex < userWords.length || correctedIndex < correctedWords.length) {
+    if (userIndex >= userWords.length) {
+      correctedDiff.push({ type: 'added', text: originalCorrectedWords[correctedIndex] });
+      correctedIndex++;
+    } else if (correctedIndex >= correctedWords.length) {
+      userDiff.push({ type: 'removed', text: originalUserWords[userIndex] });
+      userIndex++;
+    } else if (userWords[userIndex] === correctedWords[correctedIndex]) {
+      userDiff.push({ type: 'same', text: originalUserWords[userIndex] });
+      correctedDiff.push({ type: 'same', text: originalCorrectedWords[correctedIndex] });
+      userIndex++;
+      correctedIndex++;
+    } else {
+      let found = false;
+      
+      for (let i = correctedIndex; i < Math.min(correctedIndex + 3, correctedWords.length); i++) {
+        if (userWords[userIndex] === correctedWords[i]) {
+          for (let j = correctedIndex; j < i; j++) {
+            correctedDiff.push({ type: 'added', text: originalCorrectedWords[j] });
+          }
+          userDiff.push({ type: 'same', text: originalUserWords[userIndex] });
+          correctedDiff.push({ type: 'same', text: originalCorrectedWords[i] });
+          correctedIndex = i + 1;
+          userIndex++;
+          found = true;
+          break;
+        }
+      }
+      
+      if (!found) {
+        let userFound = false;
+        for (let i = userIndex; i < Math.min(userIndex + 3, userWords.length); i++) {
+          if (correctedWords[correctedIndex] === userWords[i]) {
+            for (let j = userIndex; j < i; j++) {
+              userDiff.push({ type: 'removed', text: originalUserWords[j] });
+            }
+            userDiff.push({ type: 'same', text: originalUserWords[i] });
+            correctedDiff.push({ type: 'same', text: originalCorrectedWords[correctedIndex] });
+            userIndex = i + 1;
+            correctedIndex++;
+            userFound = true;
+            break;
+          }
+        }
+        
+        if (!userFound) {
+          userDiff.push({ type: 'changed', text: originalUserWords[userIndex] });
+          correctedDiff.push({ type: 'changed', text: originalCorrectedWords[correctedIndex] });
+          userIndex++;
+          correctedIndex++;
+        }
+      }
+    }
+  }
+  
+  return { userDiff, correctedDiff };
+};
+
+// Diff 결과를 렌더링하는 컴포넌트
+const DiffText: React.FC<{ diff: DiffResult[] }> = ({ diff }) => {
+  return (
+    <span>
+      {diff.map((item, index) => {
+        let style: React.CSSProperties = {};
+        
+        switch (item.type) {
+          case 'same':
+            style = {};
+            break;
+          case 'changed':
+            style = { 
+              backgroundColor: '#ffebee', 
+              color: '#c62828', 
+              padding: '1px 3px', 
+              borderRadius: '2px',
+              fontWeight: 'bold',
+              fontSize: '0.875rem'
+            };
+            break;
+          case 'added':
+            style = { 
+              backgroundColor: '#e8f5e8', 
+              color: '#2e7d32', 
+              padding: '1px 3px', 
+              borderRadius: '2px',
+              fontWeight: 'bold',
+              fontSize: '0.875rem'
+            };
+            break;
+          case 'removed':
+            style = { 
+              backgroundColor: '#ffebee', 
+              color: '#c62828', 
+              textDecoration: 'line-through',
+              padding: '1px 3px', 
+              borderRadius: '2px',
+              fontSize: '0.875rem'
+            };
+            break;
+        }
+        
+        return (
+          <span key={index} style={style}>
+            {item.text}
+            {index < diff.length - 1 ? ' ' : ''}
+          </span>
+        );
+      })}
+    </span>
+  );
+};
+
 const Dashboard = ({ userName }: DashboardProps) => {
   const [history, setHistory] = useState<CorrectionHistory[]>([]);
   const [stats, setStats] = useState({
@@ -320,14 +450,14 @@ const Dashboard = ({ userName }: DashboardProps) => {
                         </Typography>
                       </TableCell>
                       <TableCell>
-                        <Typography variant="body2" sx={{ maxWidth: 200, wordBreak: 'break-word', color: 'error.main' }}>
-                          {item.userEnglish}
+                        <Typography variant="body2" sx={{ maxWidth: 200, wordBreak: 'break-word' }}>
+                          <DiffText diff={createDiff(item.userEnglish, item.correctedSentence).userDiff} />
                         </Typography>
                       </TableCell>
                       <TableCell>
                         <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                          <Typography variant="body2" sx={{ maxWidth: 200, wordBreak: 'break-word', color: 'success.main', fontWeight: 'medium' }}>
-                            {item.correctedSentence}
+                          <Typography variant="body2" sx={{ maxWidth: 200, wordBreak: 'break-word', fontWeight: 'medium' }}>
+                            <DiffText diff={createDiff(item.userEnglish, item.correctedSentence).correctedDiff} />
                           </Typography>
                           <Tooltip title="교정된 문장 듣기">
                             <IconButton
